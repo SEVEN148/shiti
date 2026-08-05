@@ -1473,7 +1473,7 @@ function showQuestionRecognitionResult(text = "", ocrAvailable = true) {
   const cleaned = cleanQuestionOcrText(text);
   document.querySelector("#uploadStep").hidden = true;
   document.querySelector("#recognitionForm").hidden = false;
-  document.querySelector("#questionRecognitionTitle").textContent = cleaned ? "识别完成" : "请手动补充题目";
+  document.querySelector("#questionRecognitionTitle").textContent = cleaned ? "本地 OCR 草稿" : "请手动补充题目";
   document.querySelector("#questionRecognitionHint").textContent = ocrAvailable
     ? "自动识别可能会漏掉公式和选项，请按原图核对后保存。"
     : "当前识别服务暂不可用，请根据图片手动输入题目。";

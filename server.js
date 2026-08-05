@@ -2,8 +2,8 @@ const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
 
-const host = "127.0.0.1";
-const port = Number(process.env.SHITI_PORT) || 4173;
+const host = process.env.HOST || "0.0.0.0";
+const port = Number(process.env.PORT || process.env.SHITI_PORT) || 4173;
 const root = __dirname;
 const contentTypes = {
   ".html": "text/html; charset=utf-8",
@@ -144,5 +144,6 @@ http.createServer(async (request, response) => {
     response.end(content);
   });
 }).listen(port, host, () => {
-  console.log(`拾题学习助手已启动：http://${host}:${port}`);
+  const shownHost = host === "0.0.0.0" ? "127.0.0.1" : host;
+  console.log(`拾题学习助手已启动：http://${shownHost}:${port}`);
 });

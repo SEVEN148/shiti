@@ -20,5 +20,8 @@ npm start
 ## 说明
 
 - 本项目为纯前端学习工具，学习数据保存在浏览器本地。
+- GitHub Pages 版本只能运行前端，不能运行 `server.js` 后端接口。
 - OCR 英语识别使用本地 `ocr-data/eng.traineddata.gz` 和浏览器端 Tesseract.js。
+- 数学题图片的浏览器端 OCR 只能作为草稿，公式、下标和几何符号需要人工核对。
 - 随机组卷导出依赖 html2canvas。
+- 视频链接提取等后端功能需要部署到支持 Node.js 的平台，参考 [DEPLOY_BACKEND.md](DEPLOY_BACKEND.md)。
