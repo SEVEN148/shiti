@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="拾题是一款面向高中生的拍照错题整理与学习规划工具。">
   <title>拾题学习助手</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20260805-ocr2">
 </head>
 <body>
   <div class="app-shell">
@@ -421,7 +421,7 @@
       </div>
 
       <div class="recognition-form" id="recognitionForm" hidden>
-        <div class="recognition-banner"><strong id="questionRecognitionTitle">识别完成</strong><span id="questionRecognitionHint">请确认分类，保存后会自动更新易错知识点。</span></div>
+        <div class="recognition-banner"><strong id="questionRecognitionTitle">识别完成</strong><span id="questionRecognitionHint">自动识别可能会漏掉公式和选项，请按原图核对后保存。</span></div>
         <label class="field full-field">题目内容<textarea id="questionText" rows="3" required></textarea></label>
         <div class="field-grid">
           <label class="field">学科<select id="questionSubject"><option>语文</option><option>数学</option><option>英语</option><option>物理</option><option>化学</option><option>生物</option><option>政治</option><option>历史</option><option>地理</option></select></label>
@@ -558,8 +558,8 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
-  <script src="vocabulary.js"></script>
-  <script src="vocabulary-full.js"></script>
-  <script src="app.js"></script>
+  <script src="vocabulary.js?v=20260805-ocr2"></script>
+  <script src="vocabulary-full.js?v=20260805-ocr2"></script>
+  <script src="app.js?v=20260805-ocr2"></script>
 </body>
 </html>
