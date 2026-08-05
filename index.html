@@ -408,10 +408,10 @@
 
       <div class="upload-step" id="uploadStep">
         <label class="drop-zone" id="dropZone">
-          <input id="questionImage" type="file" accept="image/*" capture="environment">
+          <input id="questionImage" type="file" accept="image/*,.heic,.heif">
           <span class="camera-mark">▣</span>
-          <strong>拍照或选择题目图片</strong>
-          <span>支持 JPG、PNG，建议只保留题目区域</span>
+          <strong>拍照或从手机相册导入题目图片</strong>
+          <span>支持 JPG、PNG、HEIC，建议只保留题目区域</span>
         </label>
         <div class="upload-preview" id="uploadPreview" hidden>
           <img id="previewImage" alt="待识别的题目图片">
@@ -446,10 +446,10 @@
       </div>
       <div id="vocabImportSource">
         <label class="drop-zone vocab-import-drop" id="vocabImportDropZone">
-          <input id="vocabImportImage" type="file" accept="image/*" capture="environment">
+          <input id="vocabImportImage" type="file" accept="image/*,.heic,.heif">
           <span class="camera-mark">词</span>
-          <strong>拍照或选择英语单词图片</strong>
-          <span>建议文字清晰、画面端正，一次不要包含过多段落</span>
+          <strong>拍照或从手机相册导入单词图片</strong>
+          <span>支持截图、相册照片和现场拍照，建议文字清晰、画面端正</span>
         </label>
         <div class="vocab-import-preview" id="vocabImportPreview" hidden>
           <img id="vocabImportPreviewImage" alt="待识别的英语单词图片">
@@ -495,10 +495,10 @@
 
         <div class="material-source-panel active" id="materialPhotoPanel">
           <label class="drop-zone material-drop-zone" id="materialDropZone">
-            <input id="materialImage" type="file" accept="image/*" capture="environment">
+            <input id="materialImage" type="file" accept="image/*,.heic,.heif">
             <span class="camera-mark">▣</span>
-            <strong>拍照或选择含文字的图片</strong>
-            <span>适合书页、报刊、课堂资料和人物故事</span>
+            <strong>拍照或从手机相册导入含文字图片</strong>
+            <span>适合截图、书页、报刊、课堂资料和人物故事</span>
           </label>
           <div class="material-image-preview" id="materialImagePreview" hidden>
             <img id="materialPreviewImage" alt="待提取文字的图片">

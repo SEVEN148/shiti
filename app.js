@@ -818,7 +818,7 @@ function waitForTesseract() {
 
 async function recognizeVocabImage() {
   if (!pendingVocabImage) {
-    showToast("请先拍照或选择图片");
+    showToast("请先拍照或从手机相册导入图片");
     return;
   }
   const button = document.querySelector("#recognizeVocabImage");
@@ -985,7 +985,7 @@ function isValidVideoUrl(value) {
 function extractMaterialDraft() {
   const videoUrl = document.querySelector("#materialVideoUrl").value.trim();
   if (materialSourceMode === "photo" && !pendingMaterialImage) {
-    showToast("请先拍照或选择图片");
+    showToast("请先拍照或从手机相册导入图片");
     return;
   }
   if (materialSourceMode === "video" && !isValidVideoUrl(videoUrl)) {
@@ -1364,7 +1364,7 @@ async function handleImage(file) {
     setTimeout(fillRecognitionResult, 1450);
   } catch {
     resetUpload();
-    showToast("图片读取失败，请重新选择");
+    showToast("图片读取失败，请换一张清晰照片或截图");
   }
 }
 
