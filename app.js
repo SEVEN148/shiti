@@ -1432,7 +1432,7 @@ async function handleImage(file) {
   try {
     pendingImage = await resizeImage(file);
     document.querySelector("#previewImage").src = pendingImage;
-    setTimeout(fillRecognitionResult, 1450);
+    await recognizeQuestionImage();
   } catch {
     resetUpload();
     showToast("图片读取失败，请换一张清晰照片或截图");
@@ -1461,15 +1461,52 @@ function resizeImage(file) {
   });
 }
 
-function fillRecognitionResult() {
+function cleanQuestionOcrText(text = "") {
+  return text
+    .replace(/\s+/g, " ")
+    .replace(/[|]{2,}/g, " ")
+    .replace(/\b\d+\s*\/\s*\d+\b/g, " ")
+    .trim();
+}
+
+function showQuestionRecognitionResult(text = "", ocrAvailable = true) {
+  const cleaned = cleanQuestionOcrText(text);
   document.querySelector("#uploadStep").hidden = true;
   document.querySelector("#recognitionForm").hidden = false;
-  document.querySelector("#questionText").value = "已知函数 f(x)=x²+ax+1，若函数在区间 [1,+∞) 上单调递增，求实数 a 的取值范围。";
+  document.querySelector("#questionRecognitionTitle").textContent = cleaned ? "识别完成" : "请手动补充题目";
+  document.querySelector("#questionRecognitionHint").textContent = ocrAvailable
+    ? "自动识别可能会漏掉公式和选项，请按原图核对后保存。"
+    : "当前识别服务暂不可用，请根据图片手动输入题目。";
+  document.querySelector("#questionText").value = cleaned;
   document.querySelector("#questionSubject").value = "数学";
   document.querySelector("#questionDifficulty").value = "中等";
-  document.querySelector("#questionKnowledge").value = "函数的单调性";
-  document.querySelector("#questionType").value = "参数讨论题";
-  document.querySelector("#questionReason").value = "没有先判断对称轴与区间的位置关系。";
+  document.querySelector("#questionKnowledge").value = "";
+  document.querySelector("#questionType").value = "";
+  document.querySelector("#questionReason").value = "";
+}
+
+async function recognizeQuestionImage() {
+  document.querySelector("#scanStatus").textContent = "正在加载题目识别模型...";
+  const available = await waitForTesseract();
+  if (!available) {
+    showQuestionRecognitionResult("", false);
+    return;
+  }
+  try {
+    const result = await window.Tesseract.recognize(pendingImage, "chi_sim+eng", {
+      workerPath: "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/worker.min.js",
+      corePath: "https://cdn.jsdelivr.net/npm/tesseract.js-core@5.1.1",
+      langPath: "https://tessdata.projectnaptha.com/4.0.0",
+      logger(message) {
+        if (message.status === "recognizing text") document.querySelector("#scanStatus").textContent = `正在识别 ${Math.round((message.progress || 0) * 100)}%`;
+        else if (message.status) document.querySelector("#scanStatus").textContent = "正在准备识别";
+      }
+    });
+    showQuestionRecognitionResult(result.data?.text || "", true);
+  } catch {
+    showQuestionRecognitionResult("", false);
+    showToast("题目识别失败，请手动补充题目内容");
+  }
 }
 
 function saveQuestion(event) {

@@ -421,13 +421,13 @@
       </div>
 
       <div class="recognition-form" id="recognitionForm" hidden>
-        <div class="recognition-banner"><strong>识别完成</strong><span>请确认分类，保存后会自动更新易错知识点。</span></div>
+        <div class="recognition-banner"><strong id="questionRecognitionTitle">识别完成</strong><span id="questionRecognitionHint">请确认分类，保存后会自动更新易错知识点。</span></div>
         <label class="field full-field">题目内容<textarea id="questionText" rows="3" required></textarea></label>
         <div class="field-grid">
           <label class="field">学科<select id="questionSubject"><option>语文</option><option>数学</option><option>英语</option><option>物理</option><option>化学</option><option>生物</option><option>政治</option><option>历史</option><option>地理</option></select></label>
           <label class="field">难度<select id="questionDifficulty"><option>基础</option><option selected>中等</option><option>困难</option></select></label>
-          <label class="field">知识点<input id="questionKnowledge" required value="函数的单调性"></label>
-          <label class="field">题型<input id="questionType" required value="参数讨论题"></label>
+          <label class="field">知识点<input id="questionKnowledge" required placeholder="例如：函数单调性、古诗鉴赏"></label>
+          <label class="field">题型<input id="questionType" required placeholder="例如：选择题、参数讨论题"></label>
         </div>
         <label class="field full-field">错误原因<textarea id="questionReason" rows="2" placeholder="例如：忽略了定义域"></textarea></label>
         <div class="modal-actions">
