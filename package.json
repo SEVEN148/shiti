@@ -1,0 +1,12 @@
+{
+  "name": "shiti-study-assistant",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "html2canvas": "1.4.1",
+    "tesseract.js": "5.1.1"
+  }
+}

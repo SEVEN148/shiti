@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="拾题是一款面向高中生的拍照错题整理与学习规划工具。">
+  <title>拾题学习助手</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand-row">
+        <button class="mobile-close icon-button" id="closeSidebar" type="button" aria-label="关闭导航">×</button>
+        <div class="brand-mark">拾</div>
+        <div>
+          <strong>拾题</strong>
+          <span>把错题变成进步</span>
+        </div>
+      </div>
+
+      <div class="student-card">
+        <button class="student-profile-button" id="editProfile" type="button" aria-label="编辑个人资料">
+          <div class="avatar" id="studentAvatar">林</div>
+          <div class="student-copy">
+            <strong id="studentName">林知夏</strong>
+            <span id="studentMeta">高二 · 理科</span>
+          </div>
+          <span class="edit-profile-label">修改</span>
+        </button>
+        <span class="level" id="studentLevel">Lv. 7</span>
+      </div>
+
+      <nav class="main-nav" aria-label="主要导航">
+        <p class="nav-label">学习总览</p>
+        <button class="nav-item active" type="button" data-page="overview">
+          <span class="nav-icon">概</span><span>概括</span>
+        </button>
+        <button class="nav-item" type="button" data-page="time">
+          <span class="nav-icon">时</span><span>时间规划</span>
+        </button>
+        <button class="nav-item" type="button" data-page="plan">
+          <span class="nav-icon">学</span><span>学习规划</span>
+        </button>
+        <button class="nav-item" type="button" data-page="rewards">
+          <span class="nav-icon">奖</span><span>学习奖励</span><span class="nav-count" id="rewardNavCount">0</span>
+        </button>
+
+        <p class="nav-label">专项学习</p>
+        <button class="nav-item" type="button" data-page="vocabulary">
+          <span class="nav-icon">词</span><span>英语词汇</span><span class="nav-count" id="vocabDueCount">0</span>
+        </button>
+        <button class="nav-item" type="button" data-page="materials">
+          <span class="nav-icon">作</span><span>作文素材</span><span class="nav-count" id="materialNavCount">0</span>
+        </button>
+
+        <p class="nav-label">错题成长</p>
+        <button class="nav-item" type="button" data-page="mistakes">
+          <span class="nav-icon">错</span><span>错题库</span><span class="nav-count" id="mistakeNavCount">0</span>
+        </button>
+        <button class="nav-item" type="button" data-page="knowledge">
+          <span class="nav-icon">点</span><span>易错知识点</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-tip">
+        <span class="tip-title">今日建议</span>
+        <strong>先复习，再刷新题</strong>
+        <p>优先处理两道重复出错的函数题。</p>
+      </div>
+    </aside>
+
+    <div class="sidebar-scrim" id="sidebarScrim"></div>
+
+    <main class="workspace">
+      <header class="topbar">
+        <button class="menu-button icon-button" id="openSidebar" type="button" aria-label="打开导航">☰</button>
+        <div class="streak-chip"><span>连续学习</span><strong id="streakDays">12 天</strong></div>
+        <label class="global-search">
+          <span aria-hidden="true">⌕</span>
+          <input id="globalSearch" type="search" placeholder="搜索错题、知识点或学习任务">
+        </label>
+        <div class="top-actions">
+          <button class="quiet-button" id="focusButton" type="button">专注计时</button>
+          <button class="primary-button" id="openUpload" type="button">＋ 拍照识题</button>
+        </div>
+      </header>
+
+      <div class="content-wrap">
+        <section class="page active" id="page-overview" data-title="概括">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">2026年8月5日 · 星期三</p>
+              <h1 id="overviewGreeting">晚上好，林知夏</h1>
+              <p>今天适合集中补齐函数与力学的薄弱环节。</p>
+            </div>
+            <button class="primary-button heading-upload" type="button" data-open-upload>＋ 上传一道错题</button>
+          </div>
+
+          <div class="overview-grid">
+            <article class="panel focus-panel">
+              <div class="panel-heading">
+                <div>
+                  <span class="panel-kicker">今日学习</span>
+                  <h2>2 小时 15 分</h2>
+                </div>
+                <span class="status-chip">进行中</span>
+              </div>
+              <div class="study-ring" aria-label="今日任务完成 68%">
+                <div class="ring-inner"><strong id="overviewProgress">68%</strong><span>已完成</span></div>
+              </div>
+              <div class="focus-copy">
+                <strong>下一项：数学错题回炉</strong>
+                <span>预计 25 分钟 · 3 道题</span>
+              </div>
+              <button class="dark-button" type="button" data-page-jump="mistakes">开始复习</button>
+            </article>
+
+            <article class="panel stat-panel">
+              <div class="panel-heading"><h2>本周错题</h2><button class="text-button" type="button" data-page-jump="mistakes">查看全部</button></div>
+              <strong class="big-number" id="weekMistakeCount">0</strong>
+              <span class="muted">较上周少 3 道</span>
+              <div class="subject-bars" id="subjectBars"></div>
+            </article>
+
+            <article class="panel schedule-panel">
+              <div class="panel-heading"><h2>今日安排</h2><button class="text-button" type="button" data-page-jump="time">调整</button></div>
+              <div class="mini-schedule" id="miniSchedule"></div>
+            </article>
+
+            <article class="panel weak-panel">
+              <div class="panel-heading"><h2>最需关注</h2><button class="text-button" type="button" data-page-jump="knowledge">查看分析</button></div>
+              <div id="weakestKnowledge"></div>
+            </article>
+
+            <article class="panel recent-panel">
+              <div class="panel-heading"><h2>最近错题</h2><button class="text-button" type="button" data-page-jump="mistakes">进入错题库</button></div>
+              <div class="recent-list" id="recentMistakes"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="page" id="page-time" data-title="时间规划">
+          <div class="page-heading compact-heading">
+            <div><p class="eyebrow">本周计划</p><h1>时间规划</h1><p>把有限的晚自习时间留给最值得解决的问题。</p></div>
+            <button class="primary-button" id="addTimeBlock" type="button">＋ 添加时间块</button>
+          </div>
+          <article class="panel focus-timer-panel" id="focusTimer">
+            <div class="timer-heading">
+              <div><span class="timer-icon" aria-hidden="true">时</span><h2>专注计时器</h2></div>
+              <span class="timer-session" id="timerSession">今日已完成 0 次</span>
+            </div>
+            <div class="timer-stage">
+              <time class="timer-display" id="timerDisplay" datetime="PT25M" aria-live="polite">25:00</time>
+              <p class="timer-status" id="timerStatus">选择时长，开始一段不被打扰的学习</p>
+              <div class="timer-presets" id="timerPresets" aria-label="选择专注时长">
+                <button type="button" data-minutes="15">15 分钟</button>
+                <button class="active" type="button" data-minutes="25">25 分钟</button>
+                <button type="button" data-minutes="45">45 分钟</button>
+                <button type="button" data-minutes="52">52 分钟</button>
+              </div>
+              <div class="timer-custom">
+                <label for="customTimerMinutes">自定义</label>
+                <div class="timer-custom-input"><input id="customTimerMinutes" type="number" min="1" max="180" step="1" value="30" inputmode="numeric"><span>分钟</span></div>
+                <button class="quiet-button" id="applyCustomTimer" type="button">应用</button>
+              </div>
+              <div class="timer-controls">
+                <button class="primary-button timer-start" id="timerStart" type="button">▶ 开始专注</button>
+                <button class="quiet-button" id="timerReset" type="button">重置</button>
+              </div>
+            </div>
+          </article>
+          <div class="time-layout">
+            <article class="panel week-panel">
+              <div class="week-header" id="weekHeader"></div>
+              <div class="week-grid" id="weekGrid"></div>
+            </article>
+            <aside class="panel time-aside">
+              <h2>时间分配</h2>
+              <div id="timeSummary"></div>
+              <div class="time-note">
+                <strong>安排建议</strong>
+                <p>把难题复盘放在精力较好的前 40 分钟，背诵类任务放在最后。</p>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="page" id="page-plan" data-title="学习规划">
+          <div class="page-heading compact-heading">
+            <div><p class="eyebrow">目标驱动</p><h1>学习规划</h1><p>从知识短板出发，安排可执行的每日任务。</p></div>
+            <button class="primary-button" id="addPlanTask" type="button">＋ 新增任务</button>
+          </div>
+          <div class="plan-layout">
+            <article class="panel plan-main">
+              <div class="plan-progress-row">
+                <div><span class="panel-kicker">本周进度</span><strong id="planPercent">0%</strong></div>
+                <div class="linear-progress"><span id="planProgressBar"></span></div>
+              </div>
+              <div class="task-groups" id="taskGroups"></div>
+            </article>
+            <aside class="panel goal-card">
+              <span class="panel-kicker">本月目标</span>
+              <h2>函数综合题正确率达到 80%</h2>
+              <div class="goal-data"><strong>63%</strong><span>当前正确率</span></div>
+              <p>还需完成 2 轮专项复习与 1 次限时检测。</p>
+              <button class="dark-button" type="button" data-page-jump="knowledge">查看薄弱点</button>
+            </aside>
+          </div>
+        </section>
+
+        <section class="page" id="page-rewards" data-title="学习奖励">
+          <div class="page-heading compact-heading">
+            <div><p class="eyebrow">用进步兑换期待</p><h1>学习奖励</h1><p>完成学习行动获得金币，把想做的小事设置成阶段奖励。</p></div>
+            <button class="primary-button" id="addReward" type="button">＋ 添加奖励</button>
+          </div>
+
+          <div class="reward-summary">
+            <article class="reward-stat coin-stat"><span>金币余额</span><strong id="rewardBalance">0</strong><small>完成学习行动自动获得</small></article>
+            <article class="reward-stat"><span>本月抽奖券</span><strong id="rewardTicketCount">0</strong><small id="rewardTicketHint">每月赠送 3 张</small></article>
+            <article class="reward-stat"><span>本月已兑换</span><strong id="rewardMonthRedeemed">0</strong><small>奖励按自己的节奏兑现</small></article>
+          </div>
+
+          <article class="panel reward-draw-panel">
+            <div class="reward-draw-copy"><span class="reward-medal">奖</span><div><h2>幸运抽奖</h2><p id="rewardDrawCaption">每月 3 张券，剩余 3 张</p></div></div>
+            <div class="reward-draw-action"><p id="rewardDrawResult">抽取额外金币，为今天的努力加一点惊喜。</p><button class="reward-draw-button" id="drawReward" type="button">开始抽奖</button></div>
+          </article>
+
+          <section class="reward-section">
+            <div class="reward-section-heading"><div><span class="panel-kicker">自己定义目标</span><h2>奖励清单</h2></div></div>
+            <div class="reward-grid" id="rewardGrid"></div>
+            <div class="empty-state" id="rewardEmpty" hidden><div class="empty-mark">奖</div><h2>还没有奖励</h2><p>设置一个真正期待的小目标。</p><button class="primary-button" type="button" data-add-reward>添加奖励</button></div>
+          </section>
+
+          <section class="reward-section reward-history-section">
+            <div class="reward-section-heading"><div><span class="panel-kicker">金币变化</span><h2>获得与兑换记录</h2></div></div>
+            <div class="reward-history" id="rewardHistory"></div>
+          </section>
+        </section>
+
+        <section class="page" id="page-vocabulary" data-title="考试词汇">
+          <div class="page-heading compact-heading">
+            <div><h1 id="vocabPageTitle">高考词汇</h1><p id="vocabPageDescription">从完整高考考试词库随机学习，并按记忆周期安排复习。</p></div>
+          </div>
+
+          <div class="vocab-level-toolbar">
+            <div><span>当前词库</span><strong id="vocabLevelLabel">高考考试词汇</strong></div>
+            <div class="vocab-level-actions">
+              <div class="segmented" id="vocabExamLevel" aria-label="选择考试词库">
+                <button class="segment-button active" type="button" data-exam-level="gaokao">高考</button>
+                <button class="segment-button" type="button" data-exam-level="zhongkao">中考</button>
+                <button class="segment-button" type="button" data-exam-level="custom">我的词库</button>
+              </div>
+              <button class="quiet-button" id="openVocabImport" type="button">上传单词照片</button>
+            </div>
+          </div>
+
+          <div class="vocab-summary" id="vocabSummary"></div>
+
+          <div class="vocab-toolbar">
+            <div class="segmented" id="vocabTabs" aria-label="词汇分类">
+              <button class="segment-button active" type="button" data-vocab-tab="today">今日背诵</button>
+              <button class="segment-button" type="button" data-vocab-tab="unfamiliar">不熟悉</button>
+              <button class="segment-button" type="button" data-vocab-tab="mastered">已熟练</button>
+            </div>
+            <div class="curve-caption"><span>复习间隔</span><strong>1 / 2 / 4 / 7 / 15 / 30 天</strong></div>
+          </div>
+
+          <div class="vocab-view active" id="vocabViewToday">
+            <article class="panel vocab-setup" id="vocabSetup">
+              <div>
+                <span class="panel-kicker">本轮学习</span>
+                <h2>生成今日单词</h2>
+                <p id="vocabDueHint">到期复习会优先加入本轮。</p>
+              </div>
+              <label class="vocab-count-field">单词数量
+                <input id="vocabCount" type="number" min="1" max="100" step="1" value="20" inputmode="numeric">
+              </label>
+              <button class="primary-button" id="generateVocab" type="button">生成单词</button>
+            </article>
+
+            <article class="panel vocab-session" id="vocabSession" hidden>
+              <div class="vocab-progress-row">
+                <span id="vocabProgressText">1 / 20</span>
+                <div class="vocab-progress"><span id="vocabProgressBar"></span></div>
+                <span id="vocabCardSource">新词</span>
+              </div>
+              <div class="word-card">
+                <div class="word-heading">
+                  <span class="word-stage" id="wordStage">高考高频词</span>
+                  <button class="word-audio" id="speakWord" type="button" aria-label="播放单词发音">发音</button>
+                </div>
+                <strong class="word-text" id="currentWord">ability</strong>
+                <div class="word-meaning" id="wordMeaning" hidden>
+                  <span>释义</span>
+                  <p id="currentMeaning">n. 能力；才能</p>
+                </div>
+                <button class="quiet-button reveal-word" id="revealWord" type="button">显示释义</button>
+              </div>
+              <div class="word-actions" id="wordActions" hidden>
+                <button class="word-action unfamiliar" type="button" data-word-action="unfamiliar">还不熟</button>
+                <button class="word-action remembered" type="button" data-word-action="remembered">本轮记住</button>
+                <button class="word-action mastered" type="button" data-word-action="mastered">已经熟练</button>
+              </div>
+            </article>
+
+            <div class="vocab-complete" id="vocabComplete" hidden>
+              <div class="empty-mark">✓</div><h2>本轮背诵完成</h2><p id="vocabCompleteText">单词已经按你的选择完成分类。</p><button class="primary-button" id="newVocabRound" type="button">再来一轮</button>
+            </div>
+          </div>
+
+          <div class="vocab-view" id="vocabViewUnfamiliar">
+            <div class="word-list" id="unfamiliarWordList"></div>
+            <div class="empty-state" id="unfamiliarEmpty" hidden><div class="empty-mark">词</div><h2>暂无不熟悉单词</h2><p>学习时标记“还不熟”的单词会出现在这里。</p></div>
+          </div>
+
+          <div class="vocab-view" id="vocabViewMastered">
+            <div class="word-list mastered-list" id="masteredWordList"></div>
+            <div class="empty-state" id="masteredEmpty" hidden><div class="empty-mark">✓</div><h2>还没有熟练单词</h2><p>确认已经掌握的单词会归纳到这里。</p></div>
+          </div>
+        </section>
+
+        <section class="page" id="page-materials" data-title="作文素材">
+          <div class="page-heading compact-heading">
+            <div><p class="eyebrow">从真实内容中积累</p><h1>作文素材</h1><p>从照片或视频内容中摘取关键段落，整理为可检索的写作素材。</p></div>
+            <button class="primary-button" id="openMaterial" type="button">＋ 添加素材</button>
+          </div>
+
+          <div class="material-summary" id="materialSummary"></div>
+          <div class="library-toolbar material-toolbar">
+            <div class="segmented" id="materialFilters" aria-label="按素材分类筛选"></div>
+            <label class="library-search"><span>⌕</span><input id="materialSearch" type="search" placeholder="搜索标题、段落或关键词"></label>
+          </div>
+          <div class="material-grid" id="materialGrid"></div>
+          <div class="empty-state" id="materialEmpty" hidden>
+            <div class="empty-mark">文</div><h2>还没有符合条件的作文素材</h2><p>拍摄书页或填写视频链接，整理第一条可复用素材。</p><button class="primary-button" type="button" data-open-material>添加素材</button>
+          </div>
+        </section>
+
+        <section class="page" id="page-mistakes" data-title="错题库">
+          <div class="page-heading compact-heading">
+            <div><p class="eyebrow">按知识点归档</p><h1>错题库</h1><p>每道错题都标明所属知识点与题型，方便集中复习。</p></div>
+            <button class="primary-button" type="button" data-open-upload>＋ 拍照添加</button>
+          </div>
+          <div class="library-toolbar">
+            <div class="segmented" id="subjectFilters" aria-label="按学科筛选"></div>
+            <label class="library-search"><span>⌕</span><input id="mistakeSearch" type="search" placeholder="搜索题目或知识点"></label>
+          </div>
+          <div class="paper-selection-bar">
+            <div><strong id="paperSelectionCount">已选 0 道</strong><span>勾选错题后随机生成复习试卷</span></div>
+            <div><button class="text-button" id="selectVisibleMistakes" type="button">全选当前</button><button class="text-button" id="clearPaperSelection" type="button">清空选择</button><button class="primary-button" id="generatePaper" type="button" disabled>生成随机试卷</button></div>
+          </div>
+          <div class="mistake-grid" id="mistakeGrid"></div>
+          <div class="empty-state" id="mistakeEmpty" hidden>
+            <div class="empty-mark">＋</div><h2>还没有符合条件的错题</h2><p>拍照上传一道题，系统会帮你完成分类。</p><button class="primary-button" type="button" data-open-upload>添加错题</button>
+          </div>
+        </section>
+
+        <section class="page" id="page-knowledge" data-title="易错知识点">
+          <div class="page-heading compact-heading">
+            <div><p class="eyebrow">由错题自动归纳</p><h1>易错知识点</h1><p>统计重复错误、关联题型和最近复习情况。</p></div>
+            <button class="quiet-button" id="reviewKnowledge" type="button">生成今日复习</button>
+          </div>
+          <div class="knowledge-summary" id="knowledgeSummary"></div>
+          <div class="knowledge-list" id="knowledgeList"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <dialog class="modal profile-modal" id="profileModal">
+    <form method="dialog" class="modal-card" id="profileForm">
+      <div class="modal-header">
+        <div><span class="panel-kicker">个人资料</span><h2>编辑个人资料</h2></div>
+        <button class="icon-button" id="closeProfile" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="profile-editor">
+        <div class="profile-avatar-editor">
+          <div class="profile-avatar-preview" id="profileAvatarPreview">林</div>
+          <label class="quiet-button profile-avatar-upload">上传头像<input id="profileAvatarInput" type="file" accept="image/*"></label>
+          <span>支持 JPG、PNG，将自动裁剪为正方形</span>
+        </div>
+        <div class="profile-fields">
+          <label class="field">昵称<input id="profileNameInput" required minlength="1" maxlength="12"></label>
+          <div class="field-grid">
+            <label class="field">年级<select id="profileGradeInput"><option>高一</option><option>高二</option><option>高三</option></select></label>
+            <label class="field">主要学科<select id="profileSubjectInput"><option>语文</option><option>数学</option><option>英语</option><option>物理</option><option>化学</option><option>生物</option><option>政治</option><option>历史</option><option>地理</option></select></label>
+          </div>
+        </div>
+      </div>
+      <div class="profile-level-panel">
+        <div class="profile-level-heading"><div><span>当前等级</span><strong id="profileLevelValue">Lv. 7</strong></div><p id="profileLevelHint">再专注 60 分钟或复习 10 次升级</p></div>
+        <div class="profile-progress-list">
+          <div><span>专注进度</span><strong id="profileFocusProgressText">0 / 60 分钟</strong><i><b id="profileFocusProgressBar"></b></i></div>
+          <div><span>复习进度</span><strong id="profileReviewProgressText">0 / 10 次</strong><i><b id="profileReviewProgressBar"></b></i></div>
+        </div>
+      </div>
+      <div class="modal-actions"><button class="quiet-button" id="cancelProfile" type="button">取消</button><button class="primary-button" type="submit">保存资料</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="modal" id="uploadModal">
+    <form method="dialog" class="modal-card" id="uploadForm">
+      <div class="modal-header">
+        <div><span class="panel-kicker">拍照识题</span><h2>添加一道错题</h2></div>
+        <button class="icon-button" id="closeUpload" type="button" aria-label="关闭">×</button>
+      </div>
+
+      <div class="upload-step" id="uploadStep">
+        <label class="drop-zone" id="dropZone">
+          <input id="questionImage" type="file" accept="image/*" capture="environment">
+          <span class="camera-mark">▣</span>
+          <strong>拍照或选择题目图片</strong>
+          <span>支持 JPG、PNG，建议只保留题目区域</span>
+        </label>
+        <div class="upload-preview" id="uploadPreview" hidden>
+          <img id="previewImage" alt="待识别的题目图片">
+          <div class="scan-line"></div>
+          <span id="scanStatus">正在识别题目内容...</span>
+        </div>
+      </div>
+
+      <div class="recognition-form" id="recognitionForm" hidden>
+        <div class="recognition-banner"><strong>识别完成</strong><span>请确认分类，保存后会自动更新易错知识点。</span></div>
+        <label class="field full-field">题目内容<textarea id="questionText" rows="3" required></textarea></label>
+        <div class="field-grid">
+          <label class="field">学科<select id="questionSubject"><option>语文</option><option>数学</option><option>英语</option><option>物理</option><option>化学</option><option>生物</option><option>政治</option><option>历史</option><option>地理</option></select></label>
+          <label class="field">难度<select id="questionDifficulty"><option>基础</option><option selected>中等</option><option>困难</option></select></label>
+          <label class="field">知识点<input id="questionKnowledge" required value="函数的单调性"></label>
+          <label class="field">题型<input id="questionType" required value="参数讨论题"></label>
+        </div>
+        <label class="field full-field">错误原因<textarea id="questionReason" rows="2" placeholder="例如：忽略了定义域"></textarea></label>
+        <div class="modal-actions">
+          <button class="quiet-button" id="reselectImage" type="button">重新选择</button>
+          <button class="primary-button" id="saveQuestion" type="submit">保存到错题库</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="modal vocab-import-modal" id="vocabImportModal">
+    <form method="dialog" class="modal-card" id="vocabImportForm">
+      <div class="modal-header">
+        <div><span class="panel-kicker">照片识别</span><h2>导入英语单词</h2></div>
+        <button class="icon-button" id="closeVocabImport" type="button" aria-label="关闭">×</button>
+      </div>
+      <div id="vocabImportSource">
+        <label class="drop-zone vocab-import-drop" id="vocabImportDropZone">
+          <input id="vocabImportImage" type="file" accept="image/*" capture="environment">
+          <span class="camera-mark">词</span>
+          <strong>拍照或选择英语单词图片</strong>
+          <span>建议文字清晰、画面端正，一次不要包含过多段落</span>
+        </label>
+        <div class="vocab-import-preview" id="vocabImportPreview" hidden>
+          <img id="vocabImportPreviewImage" alt="待识别的英语单词图片">
+          <div><span id="vocabOcrProgress">图片已准备好</span><button class="quiet-button" id="replaceVocabImportImage" type="button">重新选择</button></div>
+        </div>
+        <div class="modal-actions"><button class="primary-button" id="recognizeVocabImage" type="button">识别图片单词</button></div>
+      </div>
+      <div id="vocabImportResult" hidden>
+        <div class="recognition-banner"><strong id="vocabImportResultTitle">识别完成</strong><span id="vocabImportResultHint">请核对单词，可在竖线后补充中文释义。</span></div>
+        <label class="field full-field">识别结果<textarea id="vocabImportText" rows="12" placeholder="每行一个单词，例如：&#10;ability | n. 能力&#10;improve | v. 提高"></textarea></label>
+        <div class="vocab-import-count"><span id="vocabImportCount">识别到 0 个单词</span><small>格式：英文单词 | 中文释义；没有释义也可以保存</small></div>
+        <div class="modal-actions"><button class="quiet-button" id="backToVocabImage" type="button">返回图片</button><button class="primary-button" type="submit">保存到我的词库</button></div>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="modal paper-modal" id="paperModal">
+    <article class="modal-card paper-modal-card">
+      <div class="modal-header paper-modal-header">
+        <div><span class="panel-kicker">随机组卷</span><h2>错题复习试卷</h2></div>
+        <button class="icon-button" id="closePaper" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="paper-preview-toolbar">
+        <span id="paperQuestionCount">共 0 道题</span>
+        <div><button class="quiet-button" id="shufflePaper" type="button">重新随机</button><button class="quiet-button" id="printPaper" type="button">打印试卷</button><button class="primary-button paper-save-button" id="savePaperImage" type="button">保存到相册</button></div>
+      </div>
+      <div class="paper-sheet" id="printablePaper"></div>
+    </article>
+  </dialog>
+
+  <dialog class="modal material-modal" id="materialModal">
+    <form method="dialog" class="modal-card" id="materialForm">
+      <div class="modal-header">
+        <div><span class="panel-kicker">智能摘录</span><h2>添加作文素材</h2></div>
+        <button class="icon-button" id="closeMaterial" type="button" aria-label="关闭">×</button>
+      </div>
+
+      <div id="materialSourceStep">
+        <div class="source-tabs" id="materialSourceTabs" aria-label="选择提取方式">
+          <button class="active" type="button" data-material-source="photo">拍照提取</button>
+          <button type="button" data-material-source="video">视频链接</button>
+        </div>
+
+        <div class="material-source-panel active" id="materialPhotoPanel">
+          <label class="drop-zone material-drop-zone" id="materialDropZone">
+            <input id="materialImage" type="file" accept="image/*" capture="environment">
+            <span class="camera-mark">▣</span>
+            <strong>拍照或选择含文字的图片</strong>
+            <span>适合书页、报刊、课堂资料和人物故事</span>
+          </label>
+          <div class="material-image-preview" id="materialImagePreview" hidden>
+            <img id="materialPreviewImage" alt="待提取文字的图片">
+            <button class="quiet-button" id="replaceMaterialImage" type="button">重新选择</button>
+          </div>
+        </div>
+
+        <div class="material-source-panel" id="materialVideoPanel">
+          <label class="field">视频链接<input id="materialVideoUrl" type="url" placeholder="https://www.bilibili.com/video/... 或其他公开视频链接"></label>
+          <div class="video-source-note"><strong>链接提取说明</strong><p>本地版本会先建立可编辑摘录，接入字幕或语音识别服务后可自动读取视频原文。</p></div>
+        </div>
+
+        <div class="extract-actions">
+          <span id="materialSourceHint">请选择一张含有清晰文字的图片</span>
+          <button class="primary-button" id="extractMaterial" type="button">开始提取</button>
+        </div>
+      </div>
+
+      <div class="material-result" id="materialResult" hidden>
+        <div class="recognition-banner"><strong>本地演示提取完成</strong><span>以下内容是可编辑示例，不代表图片或视频的真实原文；保存前请根据原内容核对。</span></div>
+        <div class="field-grid">
+          <label class="field">素材标题<input id="materialTitle" required maxlength="40"></label>
+          <label class="field">分类<select id="materialCategory"><option>人物</option><option>社会</option><option>科技</option><option>文化</option><option>自然</option><option>成长</option><option>哲思</option></select></label>
+        </div>
+        <label class="field full-field">来源<input id="materialSource" required maxlength="120" placeholder="书名、文章名、视频标题或链接"></label>
+        <label class="field full-field">关键词<input id="materialKeywords" maxlength="80" placeholder="用顿号或逗号分隔，例如：坚持、选择、长期主义"></label>
+        <label class="field full-field">关键文字或段落<textarea id="materialContent" rows="9" required placeholder="提取结果会显示在这里，可继续删改和补充。"></textarea></label>
+        <div class="modal-actions">
+          <button class="quiet-button" id="backToMaterialSource" type="button">重新提取</button>
+          <button class="primary-button" type="submit">保存到素材库</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="modal material-detail-modal" id="materialDetailModal">
+    <article class="modal-card material-detail-card">
+      <div class="modal-header">
+        <div><span class="panel-kicker" id="materialDetailCategory">作文素材</span><h2 id="materialDetailTitle">素材标题</h2></div>
+        <button class="icon-button" id="closeMaterialDetail" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="material-detail-meta" id="materialDetailMeta"></div>
+      <div class="material-detail-content" id="materialDetailContent"></div>
+      <div class="modal-actions"><button class="quiet-button" id="copyMaterialDetail" type="button">复制素材</button><button class="primary-button" id="finishMaterialDetail" type="button">完成阅读</button></div>
+    </article>
+  </dialog>
+
+  <dialog class="modal small-modal" id="simpleModal">
+    <form method="dialog" class="modal-card" id="simpleForm">
+      <div class="modal-header"><div><span class="panel-kicker" id="simpleKicker">新增</span><h2 id="simpleTitle">添加内容</h2></div><button class="icon-button" id="closeSimple" type="button" aria-label="关闭">×</button></div>
+      <div id="simpleFields"></div>
+      <div class="modal-actions"><button class="quiet-button" id="cancelSimple" type="button">取消</button><button class="primary-button" type="submit">保存</button></div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
+  <script src="vocabulary.js"></script>
+  <script src="vocabulary-full.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
