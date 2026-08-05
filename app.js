@@ -1462,10 +1462,41 @@ function resizeImage(file) {
 }
 
 function cleanQuestionOcrText(text = "") {
-  return text
+  const cleaned = text
     .replace(/\s+/g, " ")
     .replace(/[|]{2,}/g, " ")
     .replace(/\b\d+\s*\/\s*\d+\b/g, " ")
+    .trim();
+  return repairMathOcrText(cleaned);
+}
+
+function repairMathOcrText(text = "") {
+  return text
+    .replace(/—|–/g, "-")
+    .replace(/正\s*方\s*体/g, "正方体")
+    .replace(/下\s*列\s*说\s*法/g, "下列说法")
+    .replace(/错\s*误/g, "错误")
+    .replace(/错误\s*的\s*是/g, "错误的是")
+    .replace(/中\s*,/g, "中，")
+    .replace(/Ti\s+ADD[;；]?\s*1\s*面\s*ACD[;；]?/gi, "面 ADD1⊥面 ACD1")
+    .replace(/面\s*4CD\s*\/\/\s*面\s*4C1B/gi, "面 ACD1∥面 A1C1B")
+    .replace(/41B1C1D[uU]/g, "A1B1C1D1")
+    .replace(/4(?=B|C|D|1)/g, "A")
+    .replace(/AhuC[i1]/gi, "A1C1")
+    .replace(/AhuCi/gi, "A1C1")
+    .replace(/CClL|CCLL|CC1L|CCI\s*L/gi, "CC1⊥")
+    .replace(/\bTi\s+ADD[;；]?\s*1\b/gi, "面 ADD1⊥")
+    .replace(/ADD[;；]\s*1/g, "ADD1⊥")
+    .replace(/ACD[;；]/g, "ACD1")
+    .replace(/([A-D])1(?=[A-D])/g, "$1₁")
+    .replace(/A1/g, "A₁")
+    .replace(/B1/g, "B₁")
+    .replace(/C1/g, "C₁")
+    .replace(/D1/g, "D₁")
+    .replace(/\/\/\s*/g, "∥")
+    .replace(/面\s*ACD\s*∥\s*面\s*AC₁B/gi, "面 ACD₁∥面 A₁C₁B")
+    .replace(/\s*⊥\s*/g, "⊥")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
