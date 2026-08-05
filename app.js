@@ -1181,7 +1181,13 @@ function renderMistakes() {
         <div class="tag-row"><span class="tag">题型：${escapeHtml(item.type)}</span><span class="tag">${item.reviewed ? "已复习" : "待复习"}</span></div>
         <p class="card-reason">错误原因：${escapeHtml(item.reason || "暂未填写")}</p>
       </div>
-      <div class="card-footer"><span class="review-state">录入 ${item.date}</span><button class="review-button" type="button" data-review-id="${item.id}">${item.reviewed ? "标记待复习" : "完成复习"}</button></div>
+      <div class="card-footer">
+        <span class="review-state">录入 ${item.date}</span>
+        <div class="card-actions">
+          <button class="review-button" type="button" data-review-id="${item.id}">${item.reviewed ? "标记待复习" : "完成复习"}</button>
+          <button class="delete-button" type="button" data-delete-mistake="${item.id}">删除</button>
+        </div>
+      </div>
     </article>
   `).join("");
   document.querySelector("#mistakeEmpty").hidden = filtered.length > 0;
@@ -1211,6 +1217,21 @@ function toggleVisibleMistakes() {
 function clearPaperSelection() {
   selectedMistakeIds.clear();
   renderMistakes();
+}
+
+function deleteMistake(id) {
+  const index = state.mistakes.findIndex((item) => item.id === id);
+  if (index < 0) return;
+  const confirmed = window.confirm("确定删除这道错题吗？删除后不可恢复。");
+  if (!confirmed) return;
+  state.mistakes.splice(index, 1);
+  selectedMistakeIds.delete(id);
+  currentPaperMistakes = currentPaperMistakes.filter((item) => item.id !== id);
+  saveState();
+  renderAll();
+  if (paperModal.open && currentPaperMistakes.length) renderPaper();
+  if (paperModal.open && !currentPaperMistakes.length) paperModal.close();
+  showToast("错题已删除");
 }
 
 function shuffleItems(items) {
@@ -1478,6 +1499,24 @@ function repairMathOcrText(text = "") {
     .replace(/错\s*误/g, "错误")
     .replace(/错误\s*的\s*是/g, "错误的是")
     .replace(/中\s*,/g, "中，")
+    .replace(/已\s*知\s*函\s*数/g, "已知函数")
+    .replace(/函\s*数\s*\/\s*\(\s*[ax]\s*\)\s*二\s*\|?\s*[il1]n[zx]\s*\|?/gi, "函数 f(x)=|ln x|")
+    .replace(/\/\s*\(\s*[ax]\s*\)/gi, "f(x)")
+    .replace(/\bF\s*\(/g, "f(")
+    .replace(/二\s*\|?\s*[il1]n[zx]\s*\|?/gi, "=|ln x|")
+    .replace(/\|\s*[il1]n[zx]\s*\|/gi, "|ln x|")
+    .replace(/[.#]\s*(?=a\s*=)/gi, "，")
+    .replace(/a\s*=\s*[（(]\s*2\s*3\s*[）)]/gi, "a=f(2/3)")
+    .replace(/b\s*=\s*f\s*\(\s*3[°oº]\s*[%％]\s*\)/gi, "b=f(3^0.5)")
+    .replace(/c\s*=\s*[7f]\s*\(\s*37\s*[%％]\s*\)/gi, "c=f(3/7)")
+    .replace(/\s*\.\s*，/g, "，")
+    .replace(/(a=f\([^)]*\))\s+(b=f)/gi, "$1，$2")
+    .replace(/,\s*c=/gi, "，c=")
+    .replace(/\s*,\s*则/g, "，则")
+    .replace(/则\s*a\s*b\s*c\s*的\s*大\s*小\s*关\s*系/g, "则 a,b,c 的大小关系")
+    .replace(/关系\s*为/g, "关系为")
+    .replace(/([A-D]\.)\s*([abc])\s*<\s*5\s*<\s*([abc])/g, "$1$2<b<$3")
+    .replace(/([A-D]\.)\s*5\s*<\s*([abc])\s*<\s*([abc])/g, "$1b<$2<$3")
     .replace(/Ti\s+ADD[;；]?\s*1\s*面\s*ACD[;；]?/gi, "面 ADD1⊥面 ACD1")
     .replace(/面\s*4CD\s*\/\/\s*面\s*4C1B/gi, "面 ACD1∥面 A1C1B")
     .replace(/41B1C1D[uU]/g, "A1B1C1D1")
@@ -1504,6 +1543,7 @@ function inferQuestionMeta(text = "") {
   const compact = text.toLowerCase();
   const rules = [
     { subject: "数学", knowledge: "空间几何", type: "线面位置关系题", match: /正方体|长方体|棱锥|棱柱|空间|异面|直线.*平面|平面.*平面|线面|面.*面|垂直|平行|\/\/|⊥/ },
+    { subject: "数学", knowledge: "函数与对数", type: "函数值比较题", match: /ln\s*x|对数|函数值|大小关系|f\(x\).*ln|a,b,c/ },
     { subject: "数学", knowledge: "函数的单调性", type: "参数讨论题", match: /函数|f\(|单调|递增|递减|定义域|值域|导数|极值/ },
     { subject: "数学", knowledge: "圆锥曲线", type: "解析几何题", match: /椭圆|双曲线|抛物线|焦点|准线|离心率|圆锥曲线/ },
     { subject: "数学", knowledge: "数列", type: "通项与求和题", match: /数列|等差|等比|通项|前n项|求和|递推/ },
@@ -1940,6 +1980,11 @@ document.querySelector("#mistakeGrid").addEventListener("change", (event) => {
   renderMistakes();
 });
 document.querySelector("#mistakeGrid").addEventListener("click", (event) => {
+  const deleteButton = event.target.closest("[data-delete-mistake]");
+  if (deleteButton) {
+    deleteMistake(deleteButton.dataset.deleteMistake);
+    return;
+  }
   const button = event.target.closest("[data-review-id]");
   if (!button) return;
   const item = state.mistakes.find((mistake) => mistake.id === button.dataset.reviewId);

@@ -442,8 +442,10 @@ button:active { transform: translateY(1px); }
 .difficulty.困难 { background: #f6e4e1; color: var(--red); }
 .card-reason { margin: 13px 0 0; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; line-height: 1.6; }
 .card-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; border-top: 1px solid var(--line); background: #fbf9f3; }
+.card-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
 .review-state { color: var(--muted); font-size: 11px; }
 .review-button { border: 0; background: transparent; color: var(--green); font-size: 12px; font-weight: 800; cursor: pointer; }
+.delete-button { border: 0; background: transparent; color: var(--red); font-size: 12px; font-weight: 800; cursor: pointer; }
 .empty-state { padding: 70px 20px; border: 1px dashed var(--line-strong); border-radius: var(--radius); background: rgba(255,255,255,.36); text-align: center; }
 .empty-mark { display: grid; width: 52px; height: 52px; margin: 0 auto 15px; place-items: center; border: 1px solid var(--line-strong); border-radius: 50%; color: var(--green); font-size: 23px; }
 .empty-state h2 { margin: 0 0 7px; font-size: 17px; }
