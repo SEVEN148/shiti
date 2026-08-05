@@ -940,6 +940,7 @@ function resetMaterialModal() {
   pendingMaterialImage = "";
   document.querySelector("#materialImage").value = "";
   document.querySelector("#materialVideoUrl").value = "";
+  document.querySelector("#materialVideoText").value = "";
   document.querySelector("#materialImagePreview").hidden = true;
   document.querySelector("#materialDropZone").hidden = false;
   document.querySelector("#materialSourceStep").hidden = false;
@@ -954,7 +955,7 @@ function setMaterialSourceMode(mode) {
   document.querySelector("#materialVideoPanel").classList.toggle("active", materialSourceMode === "video");
   document.querySelector("#materialSourceHint").textContent = materialSourceMode === "photo"
     ? pendingMaterialImage ? "图片已准备好，可以开始提取" : "请选择一张含有清晰文字的图片"
-    : "填写公开视频链接后开始建立摘录";
+    : "粘贴视频字幕或文案后开始整理素材";
 }
 
 async function handleMaterialImage(file) {
@@ -982,8 +983,39 @@ function isValidVideoUrl(value) {
   }
 }
 
+function normalizeMaterialText(value = "") {
+  return value.replace(/\r/g, "\n").replace(/[ \t]+/g, " ").replace(/\n{3,}/g, "\n\n").trim();
+}
+
+function splitMaterialSentences(text = "") {
+  return normalizeMaterialText(text)
+    .split(/(?<=[。！？!?；;])|\n+/)
+    .map((sentence) => sentence.trim())
+    .filter((sentence) => sentence.length >= 8);
+}
+
+function inferMaterialTitle(text = "", fallback = "视频关键观点摘录") {
+  const firstLine = normalizeMaterialText(text).split(/\n+/).find(Boolean) || fallback;
+  return firstLine.replace(/[#【】]/g, "").slice(0, 28);
+}
+
+function inferMaterialKeywords(text = "") {
+  const candidates = ["坚持", "成长", "选择", "责任", "科技", "文化", "自然", "青年", "奋斗", "创新", "规则", "理想", "时代", "社会", "人物", "观点"];
+  const matched = candidates.filter((word) => text.includes(word)).slice(0, 5);
+  return matched.length ? matched.join("、") : "观点、事例、写作主题";
+}
+
+function buildVideoMaterialContent(text = "") {
+  const clean = normalizeMaterialText(text);
+  const sentences = splitMaterialSentences(clean);
+  const quote = sentences.find((sentence) => sentence.length <= 70) || sentences[0] || clean.slice(0, 70);
+  const summary = sentences.slice(0, 3).join("");
+  return `关键文字：${quote}\n\n内容概括：${summary || clean.slice(0, 120)}\n\n可用主题：可结合材料内容补充为成长、选择、责任、时代、科技或文化等作文角度。\n\n原始摘录：\n${clean}`;
+}
+
 function extractMaterialDraft() {
   const videoUrl = document.querySelector("#materialVideoUrl").value.trim();
+  const videoText = normalizeMaterialText(document.querySelector("#materialVideoText").value);
   if (materialSourceMode === "photo" && !pendingMaterialImage) {
     showToast("请先拍照或从手机相册导入图片");
     return;
@@ -992,27 +1024,31 @@ function extractMaterialDraft() {
     showToast("请填写完整、有效的视频链接");
     return;
   }
+  if (materialSourceMode === "video" && videoText.length < 12) {
+    showToast("请先粘贴视频字幕、简介或关键段落");
+    return;
+  }
 
   const button = document.querySelector("#extractMaterial");
   button.disabled = true;
   button.textContent = "正在建立摘录...";
   setTimeout(() => {
-    fillMaterialDraft(videoUrl);
+    fillMaterialDraft(videoUrl, videoText);
     button.disabled = false;
     button.textContent = "开始提取";
   }, 800);
 }
 
-function fillMaterialDraft(videoUrl) {
+function fillMaterialDraft(videoUrl, videoText = "") {
   const isVideo = materialSourceMode === "video";
   document.querySelector("#materialSourceStep").hidden = true;
   document.querySelector("#materialResult").hidden = false;
-  document.querySelector("#materialTitle").value = isVideo ? "视频关键观点摘录（待核对）" : "图片文字摘录（待核对）";
+  document.querySelector("#materialTitle").value = isVideo ? inferMaterialTitle(videoText) : "图片文字摘录（待核对）";
   document.querySelector("#materialCategory").value = isVideo ? "社会" : "成长";
   document.querySelector("#materialSource").value = isVideo ? videoUrl : "图片摘录（请补充书名、文章名或作者）";
-  document.querySelector("#materialKeywords").value = "观点、事例、写作主题";
+  document.querySelector("#materialKeywords").value = isVideo ? inferMaterialKeywords(videoText) : "观点、事例、写作主题";
   document.querySelector("#materialContent").value = isVideo
-    ? "【请根据视频字幕或语音核对并替换以下内容】\n\n关键事实：记录视频中具有时间、人物或数据依据的事实。\n\n核心观点：用一到两句话概括讲述者的主要判断。\n\n可引用表达：摘录最有表现力、适合写作引用的原句。\n\n写作角度：说明这段素材可以用于哪些作文主题。"
+    ? buildVideoMaterialContent(videoText)
     : "【请根据原图核对并替换以下内容】\n\n关键文字：摘录图片中最有信息量或表现力的句子。\n\n内容概括：用自己的话概括事件、人物或观点。\n\n写作角度：说明这段素材可以用于哪些作文主题。";
 }
 
