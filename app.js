@@ -983,6 +983,19 @@ function isValidVideoUrl(value) {
   }
 }
 
+function extractFirstUrl(value = "") {
+  const match = value.match(/https?:\/\/[^\s，。！？!?；;'"<>]+/i);
+  return match ? match[0].replace(/[，。！？!?；;、]+$/, "") : "";
+}
+
+function cleanVideoShareText(value = "", url = "") {
+  let text = value.replace(url, " ");
+  text = text.replace(/复制此链接[\s\S]*$/g, " ");
+  const firstUseful = text.search(/[【#\u4e00-\u9fa5]/);
+  if (firstUseful > 0) text = text.slice(firstUseful);
+  return normalizeMaterialText(text.replace(/#\s*/g, "#"));
+}
+
 function normalizeMaterialText(value = "") {
   return value.replace(/\r/g, "\n").replace(/[ \t]+/g, " ").replace(/\n{3,}/g, "\n\n").trim();
 }
@@ -1021,6 +1034,7 @@ async function extractVideoMaterialFromBackend(videoUrl) {
   });
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
+    if (response.status === 404) throw new Error("当前网站还没有连接后端平台，可先粘贴完整分享文案或字幕");
     throw new Error(error.message || "后端提取失败");
   }
   const data = await response.json();
@@ -1029,8 +1043,10 @@ async function extractVideoMaterialFromBackend(videoUrl) {
 }
 
 async function extractMaterialDraft() {
-  const videoUrl = document.querySelector("#materialVideoUrl").value.trim();
-  let videoText = normalizeMaterialText(document.querySelector("#materialVideoText").value);
+  const videoInput = document.querySelector("#materialVideoUrl").value.trim();
+  const videoUrl = extractFirstUrl(videoInput);
+  const shareText = cleanVideoShareText(videoInput, videoUrl);
+  let videoText = normalizeMaterialText([document.querySelector("#materialVideoText").value, shareText].filter(Boolean).join("\n\n"));
   let videoData = null;
   if (materialSourceMode === "photo" && !pendingMaterialImage) {
     showToast("请先拍照或从手机相册导入图片");
