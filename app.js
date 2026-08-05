@@ -1469,8 +1469,30 @@ function cleanQuestionOcrText(text = "") {
     .trim();
 }
 
+function inferQuestionMeta(text = "") {
+  const compact = text.toLowerCase();
+  const rules = [
+    { subject: "数学", knowledge: "空间几何", type: "线面位置关系题", match: /正方体|长方体|棱锥|棱柱|空间|异面|直线.*平面|平面.*平面|线面|面.*面|垂直|平行|\/\/|⊥/ },
+    { subject: "数学", knowledge: "函数的单调性", type: "参数讨论题", match: /函数|f\(|单调|递增|递减|定义域|值域|导数|极值/ },
+    { subject: "数学", knowledge: "圆锥曲线", type: "解析几何题", match: /椭圆|双曲线|抛物线|焦点|准线|离心率|圆锥曲线/ },
+    { subject: "数学", knowledge: "数列", type: "通项与求和题", match: /数列|等差|等比|通项|前n项|求和|递推/ },
+    { subject: "数学", knowledge: "概率统计", type: "概率统计题", match: /概率|随机|频率|方差|期望|样本|统计|分布/ },
+    { subject: "物理", knowledge: "牛顿运动定律", type: "受力分析题", match: /物体|质量|加速度|摩擦|拉力|牛顿|受力|弹簧|滑块/ },
+    { subject: "物理", knowledge: "电路与电学", type: "电路分析题", match: /电路|电流|电压|电阻|欧姆|功率|电场|磁场/ },
+    { subject: "化学", knowledge: "氧化还原反应", type: "反应原理题", match: /氧化|还原|电子|化合价|离子方程|配平/ },
+    { subject: "化学", knowledge: "化学方程式", type: "方程式书写题", match: /方程式|反应物|生成物|沉淀|气体|溶液|酸性|碱性/ },
+    { subject: "英语", knowledge: "英语语法", type: "语法填空题", match: /\b(which|that|where|when|because|although|conducted|doing|done|to do)\b|语法|填空/ },
+    { subject: "英语", knowledge: "阅读理解", type: "阅读理解题", match: /\baccording to|main idea|passage|paragraph|author\b|阅读理解/ },
+    { subject: "语文", knowledge: "文言文阅读", type: "文言翻译题", match: /文言|翻译|加点|实词|虚词|断句/ },
+    { subject: "语文", knowledge: "古诗词鉴赏", type: "诗歌鉴赏题", match: /诗|词|意象|抒发|赏析|炼字/ },
+    { subject: "语文", knowledge: "作文素材", type: "议论文素材题", match: /作文|议论文|素材|论点|论据|主题/ }
+  ];
+  return rules.find((rule) => rule.match.test(compact)) || { subject: "数学", knowledge: "", type: "" };
+}
+
 function showQuestionRecognitionResult(text = "", ocrAvailable = true) {
   const cleaned = cleanQuestionOcrText(text);
+  const meta = inferQuestionMeta(cleaned);
   document.querySelector("#uploadStep").hidden = true;
   document.querySelector("#recognitionForm").hidden = false;
   document.querySelector("#questionRecognitionTitle").textContent = cleaned ? "本地 OCR 草稿" : "请手动补充题目";
@@ -1478,10 +1500,10 @@ function showQuestionRecognitionResult(text = "", ocrAvailable = true) {
     ? "自动识别可能会漏掉公式和选项，请按原图核对后保存。"
     : "当前识别服务暂不可用，请根据图片手动输入题目。";
   document.querySelector("#questionText").value = cleaned;
-  document.querySelector("#questionSubject").value = "数学";
+  document.querySelector("#questionSubject").value = meta.subject;
   document.querySelector("#questionDifficulty").value = "中等";
-  document.querySelector("#questionKnowledge").value = "";
-  document.querySelector("#questionType").value = "";
+  document.querySelector("#questionKnowledge").value = meta.knowledge;
+  document.querySelector("#questionType").value = meta.type;
   document.querySelector("#questionReason").value = "";
 }
 
