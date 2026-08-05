@@ -598,6 +598,7 @@ body.focus-mode .content-wrap { max-width: 1280px; }
   .page-heading { align-items: flex-start; }
   .page-heading h1 { font-size: 24px; }
   .page-heading > .primary-button, .heading-upload { display: none; }
+  .page-heading > .primary-button.mobile-keep-action { display: inline-flex; align-items: center; justify-content: center; }
   .overview-grid { grid-template-columns: 1fr; grid-template-areas: "focus" "stats" "weak" "schedule" "recent"; }
   .focus-panel { min-height: 460px; }
   .focus-timer-panel { padding: 17px 14px 20px; }
