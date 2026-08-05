@@ -955,7 +955,7 @@ function setMaterialSourceMode(mode) {
   document.querySelector("#materialVideoPanel").classList.toggle("active", materialSourceMode === "video");
   document.querySelector("#materialSourceHint").textContent = materialSourceMode === "photo"
     ? pendingMaterialImage ? "图片已准备好，可以开始提取" : "请选择一张含有清晰文字的图片"
-    : "粘贴视频字幕或文案后开始整理素材";
+    : "粘贴视频链接，或补充字幕文案后开始整理";
 }
 
 async function handleMaterialImage(file) {
@@ -1013,9 +1013,25 @@ function buildVideoMaterialContent(text = "") {
   return `关键文字：${quote}\n\n内容概括：${summary || clean.slice(0, 120)}\n\n可用主题：可结合材料内容补充为成长、选择、责任、时代、科技或文化等作文角度。\n\n原始摘录：\n${clean}`;
 }
 
-function extractMaterialDraft() {
+async function extractVideoMaterialFromBackend(videoUrl) {
+  const response = await fetch("/api/material/video-extract", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ url: videoUrl })
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.message || "后端提取失败");
+  }
+  const data = await response.json();
+  if (!normalizeMaterialText(data.text).length) throw new Error("没有提取到可用文字");
+  return data;
+}
+
+async function extractMaterialDraft() {
   const videoUrl = document.querySelector("#materialVideoUrl").value.trim();
-  const videoText = normalizeMaterialText(document.querySelector("#materialVideoText").value);
+  let videoText = normalizeMaterialText(document.querySelector("#materialVideoText").value);
+  let videoData = null;
   if (materialSourceMode === "photo" && !pendingMaterialImage) {
     showToast("请先拍照或从手机相册导入图片");
     return;
@@ -1024,29 +1040,32 @@ function extractMaterialDraft() {
     showToast("请填写完整、有效的视频链接");
     return;
   }
-  if (materialSourceMode === "video" && videoText.length < 12) {
-    showToast("请先粘贴视频字幕、简介或关键段落");
-    return;
-  }
 
   const button = document.querySelector("#extractMaterial");
   button.disabled = true;
-  button.textContent = "正在建立摘录...";
-  setTimeout(() => {
-    fillMaterialDraft(videoUrl, videoText);
+  button.textContent = materialSourceMode === "video" && videoText.length < 12 ? "正在通过后端提取..." : "正在建立摘录...";
+  try {
+    if (materialSourceMode === "video" && videoText.length < 12) {
+      videoData = await extractVideoMaterialFromBackend(videoUrl);
+      videoText = normalizeMaterialText(videoData.text);
+    }
+    fillMaterialDraft(videoUrl, videoText, videoData);
+  } catch (error) {
+    showToast(error.message.includes("Failed to fetch") ? "当前网站还没有连接后端平台，可先粘贴字幕或文案" : error.message);
+  } finally {
     button.disabled = false;
     button.textContent = "开始提取";
-  }, 800);
+  }
 }
 
-function fillMaterialDraft(videoUrl, videoText = "") {
+function fillMaterialDraft(videoUrl, videoText = "", videoData = null) {
   const isVideo = materialSourceMode === "video";
   document.querySelector("#materialSourceStep").hidden = true;
   document.querySelector("#materialResult").hidden = false;
-  document.querySelector("#materialTitle").value = isVideo ? inferMaterialTitle(videoText) : "图片文字摘录（待核对）";
+  document.querySelector("#materialTitle").value = isVideo ? (videoData?.title || inferMaterialTitle(videoText)) : "图片文字摘录（待核对）";
   document.querySelector("#materialCategory").value = isVideo ? "社会" : "成长";
   document.querySelector("#materialSource").value = isVideo ? videoUrl : "图片摘录（请补充书名、文章名或作者）";
-  document.querySelector("#materialKeywords").value = isVideo ? inferMaterialKeywords(videoText) : "观点、事例、写作主题";
+  document.querySelector("#materialKeywords").value = isVideo ? (videoData?.keywords?.join("、") || inferMaterialKeywords(videoText)) : "观点、事例、写作主题";
   document.querySelector("#materialContent").value = isVideo
     ? buildVideoMaterialContent(videoText)
     : "【请根据原图核对并替换以下内容】\n\n关键文字：摘录图片中最有信息量或表现力的句子。\n\n内容概括：用自己的话概括事件、人物或观点。\n\n写作角度：说明这段素材可以用于哪些作文主题。";
