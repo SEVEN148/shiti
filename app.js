@@ -5,14 +5,14 @@ const MATERIAL_CATEGORIES = ["人物", "社会", "科技", "文化", "自然", "
 
 const defaultState = {
   profile: {
-    name: "林知夏",
-    grade: "高二",
+    name: "同学",
+    grade: "高一",
     track: "理科",
     mainSubject: "数学",
     avatar: ""
   },
   progress: {
-    totalFocusMinutes: 360,
+    totalFocusMinutes: 0,
     totalReviews: 0
   },
   focus: {
@@ -22,9 +22,9 @@ const defaultState = {
     date: ""
   },
   reward: {
-    coins: 105,
+    coins: 0,
     month: "",
-    tickets: 3,
+    tickets: 0,
     drawsUsed: 0,
     redemptionsThisMonth: 0,
     items: [
@@ -45,131 +45,10 @@ const defaultState = {
     unfamiliar: {},
     mastered: {}
   },
-  materials: [
-    {
-      id: "ma-101",
-      title: "把困难拆成每天可以完成的小事",
-      category: "成长",
-      source: "示例素材 · 学习方法访谈",
-      sourceType: "video",
-      keywords: ["坚持", "行动", "长期主义"],
-      content: "真正拉开差距的，往往不是某一次突如其来的努力，而是把一个遥远目标拆成今天能够完成的小事。每天向前一点，短期看并不起眼，时间却会把这些微小行动累积成清晰的改变。\n\n写作角度：可用于“坚持与成长”“量变与质变”“长期主义”等主题。",
-      date: "08-05",
-      image: ""
-    },
-    {
-      id: "ma-102",
-      title: "技术的价值最终要回到人的需要",
-      category: "科技",
-      source: "示例素材 · 科技评论文章",
-      sourceType: "photo",
-      keywords: ["科技伦理", "人的尺度", "创新"],
-      content: "衡量一项技术是否真正进步，不能只看速度更快、参数更高，也要看它是否回应了真实的人类需要。技术提供能力，社会则需要用责任、规则与同理心为这种能力确定方向。\n\n写作角度：可用于“科技与人文”“创新的边界”“责任”等主题。",
-      date: "08-04",
-      image: ""
-    },
-    {
-      id: "ma-103",
-      title: "文化传承不是复刻过去",
-      category: "文化",
-      source: "示例素材 · 传统文化纪录片",
-      sourceType: "video",
-      keywords: ["传承", "创新", "文化自信"],
-      content: "传承并不是把过去原封不动地搬到今天，而是在理解其精神内核之后，为它找到新的表达方式。只有当传统进入当代生活、回应当代人的情感，它才会继续生长。\n\n写作角度：可用于“传统与创新”“文化自信”“守正创新”等主题。",
-      date: "08-03",
-      image: ""
-    }
-  ],
-  mistakes: [
-    {
-      id: "m-101",
-      subject: "数学",
-      knowledge: "函数的单调性",
-      type: "参数讨论题",
-      difficulty: "困难",
-      question: "已知函数 f(x)=x²+(2a-1)x+1，若 f(x) 在区间 [1,+∞) 上单调递增，求 a 的取值范围。",
-      reason: "忽略了开口方向与对称轴位置需要同时判断。",
-      date: "08-05",
-      reviewed: false,
-      image: ""
-    },
-    {
-      id: "m-102",
-      subject: "物理",
-      knowledge: "牛顿第二定律",
-      type: "连接体问题",
-      difficulty: "中等",
-      question: "质量分别为 2 kg 和 3 kg 的两物体用轻绳连接，在水平拉力作用下运动，求绳中张力。",
-      reason: "整体法求加速度后，没有正确选取隔离对象。",
-      date: "08-04",
-      reviewed: true,
-      image: ""
-    },
-    {
-      id: "m-103",
-      subject: "数学",
-      knowledge: "圆锥曲线",
-      type: "离心率求值",
-      difficulty: "中等",
-      question: "椭圆 C 的焦点为 F₁、F₂，点 P 在椭圆上且满足 PF₁=2PF₂，求椭圆离心率的范围。",
-      reason: "三角形两边关系转换为焦半径时漏掉范围条件。",
-      date: "08-03",
-      reviewed: false,
-      image: ""
-    },
-    {
-      id: "m-104",
-      subject: "化学",
-      knowledge: "氧化还原反应",
-      type: "离子方程式",
-      difficulty: "基础",
-      question: "在酸性条件下配平 MnO₄⁻ 与 Fe²⁺ 反应的离子方程式。",
-      reason: "电子守恒正确，但电荷守恒检查不完整。",
-      date: "08-02",
-      reviewed: true,
-      image: ""
-    },
-    {
-      id: "m-105",
-      subject: "英语",
-      knowledge: "非谓语动词",
-      type: "语法填空",
-      difficulty: "中等",
-      question: "The research, ___ (conduct) over three years, revealed a clear pattern.",
-      reason: "没有识别 research 与 conduct 之间的被动关系。",
-      date: "08-01",
-      reviewed: false,
-      image: ""
-    },
-    {
-      id: "m-106",
-      subject: "数学",
-      knowledge: "函数的单调性",
-      type: "导数判断",
-      difficulty: "中等",
-      question: "讨论函数 f(x)=x-ln x 在其定义域上的单调区间与极值。",
-      reason: "求出导数零点后，符号表区间方向标反。",
-      date: "07-31",
-      reviewed: false,
-      image: ""
-    }
-  ],
-  tasks: [
-    { id: "t-1", group: "今天", title: "复习函数单调性错题", note: "错题库中 3 道相关题", duration: "25 分钟", done: false },
-    { id: "t-2", group: "今天", title: "完成牛顿定律专项练习", note: "练习册第 42-43 页", duration: "35 分钟", done: true },
-    { id: "t-3", group: "今天", title: "背诵英语高频短语", note: "清单第 6 组", duration: "20 分钟", done: false },
-    { id: "t-4", group: "本周", title: "整理圆锥曲线二级结论", note: "形成一页复习笔记", duration: "45 分钟", done: false },
-    { id: "t-5", group: "本周", title: "完成化学周测复盘", note: "标记重复错误", duration: "30 分钟", done: true }
-  ],
-  schedule: [
-    { id: "s-1", day: 0, slot: 0, title: "函数错题复盘", subject: "数学", duration: 40 },
-    { id: "s-2", day: 1, slot: 1, title: "力学专项", subject: "物理", duration: 45 },
-    { id: "s-3", day: 2, slot: 0, title: "圆锥曲线训练", subject: "数学", duration: 40 },
-    { id: "s-4", day: 2, slot: 2, title: "英语短语背诵", subject: "英语", duration: 25 },
-    { id: "s-5", day: 3, slot: 1, title: "错题二次订正", subject: "复习", duration: 35 },
-    { id: "s-6", day: 4, slot: 0, title: "化学方程式", subject: "化学", duration: 40 },
-    { id: "s-7", day: 5, slot: 2, title: "本周综合复盘", subject: "复习", duration: 60 }
-  ]
+  materials: [],
+  mistakes: [],
+  tasks: [],
+  schedule: []
 };
 
 let state = loadState();
@@ -213,9 +92,19 @@ function migrateVocabularyMap(records = {}) {
   return Object.fromEntries(Object.entries(records).map(([key, value]) => [migrateVocabularyKey(key), value]));
 }
 
+function isLegacyDemoState(saved) {
+  return saved?.profile?.name === "林知夏"
+    && Number(saved?.progress?.totalFocusMinutes) === 360
+    && Array.isArray(saved?.mistakes) && saved.mistakes.length === 6
+    && Array.isArray(saved?.materials) && saved.materials.length === 3
+    && Array.isArray(saved?.tasks) && saved.tasks.length === 5
+    && Array.isArray(saved?.schedule) && saved.schedule.length === 7;
+}
+
 function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (isLegacyDemoState(saved)) return structuredClone(defaultState);
     if (!saved || !saved.mistakes || !saved.tasks || !saved.schedule) return structuredClone(defaultState);
     return {
       ...structuredClone(defaultState),
@@ -302,7 +191,7 @@ function profileLevelData() {
   const focusProgress = state.progress.totalFocusMinutes % 60;
   const reviewProgress = state.progress.totalReviews % 10;
   return {
-    level: 1 + focusLevels + reviewLevels,
+    level: focusLevels + reviewLevels,
     focusProgress,
     reviewProgress,
     focusRemaining: 60 - focusProgress,
@@ -411,7 +300,7 @@ function ensureRewardMonth() {
   const month = localDateKey().slice(0, 7);
   if (state.reward.month === month) return;
   state.reward.month = month;
-  state.reward.tickets = 3;
+  state.reward.tickets = Math.max(0, Number(state.reward.tickets) || 0);
   state.reward.drawsUsed = 0;
   state.reward.redemptionsThisMonth = 0;
   saveState();
@@ -444,14 +333,14 @@ function renderRewards() {
   document.querySelector("#rewardMonthRedeemed").textContent = reward.redemptionsThisMonth;
   document.querySelector("#rewardTicketHint").textContent = `本月已使用 ${reward.drawsUsed} 张`;
   document.querySelector("#rewardNavCount").textContent = reward.coins;
-  document.querySelector("#rewardDrawCaption").textContent = `每月 3 张券，剩余 ${reward.tickets} 张`;
+  document.querySelector("#rewardDrawCaption").textContent = `当前剩余 ${reward.tickets} 张抽奖券`;
   const latestDraw = reward.history.find((item) => item.type === "draw");
   document.querySelector("#rewardDrawResult").textContent = latestDraw
     ? `上次抽中了 ${latestDraw.amount} 金币，继续积累下一份奖励。`
     : "抽取额外金币，为今天的努力加一点惊喜。";
   const drawButton = document.querySelector("#drawReward");
   drawButton.disabled = reward.tickets <= 0;
-  drawButton.textContent = reward.tickets > 0 ? "开始抽奖" : "本月抽奖券已用完";
+  drawButton.textContent = reward.tickets > 0 ? "开始抽奖" : "暂无抽奖券";
 
   document.querySelector("#rewardGrid").innerHTML = reward.items.map((item) => {
     const affordable = reward.coins >= item.cost;
@@ -483,7 +372,7 @@ function rewardHistoryDate(value) {
 function drawRewardPrize() {
   ensureRewardMonth();
   if (state.reward.tickets <= 0) {
-    showToast("本月抽奖券已经用完");
+    showToast("暂无抽奖券");
     return;
   }
   const prizes = [5, 8, 10, 10, 12, 15, 20, 30];
