@@ -1026,6 +1026,36 @@ function buildVideoMaterialContent(text = "") {
   return `关键文字：${quote}\n\n内容概括：${summary || clean.slice(0, 120)}\n\n可用主题：可结合材料内容补充为成长、选择、责任、时代、科技或文化等作文角度。\n\n原始摘录：\n${clean}`;
 }
 
+function cleanMaterialOcrText(text = "") {
+  return normalizeMaterialText(text
+    .replace(/[|]{2,}/g, " ")
+    .replace(/[＿_]{2,}/g, "\n")
+    .replace(/\s*([，。！？；：、])\s*/g, "$1")
+    .replace(/([一-龥])\s+([一-龥])/g, "$1$2"));
+}
+
+function buildPhotoMaterialContent(text = "") {
+  const clean = cleanMaterialOcrText(text);
+  if (!clean) {
+    return "没有识别到清晰文字。\n\n可以重新拍一张更正、更亮的图片，或直接在这里手动输入图片中的素材内容。";
+  }
+  const sentences = splitMaterialSentences(clean);
+  const quote = sentences.find((sentence) => sentence.length >= 18 && sentence.length <= 90) || sentences[0] || clean.slice(0, 90);
+  const summary = sentences.slice(0, 3).join("");
+  return `关键文字：${quote}\n\n内容概括：${summary || clean.slice(0, 140)}\n\n写作角度：可根据原文补充为人物品质、热爱生活、逆境成长、社会责任等作文主题。\n\n原始识别文字：\n${clean}`;
+}
+
+async function recognizeMaterialImage() {
+  const available = await waitForTesseract();
+  if (!available) throw new Error("当前识别服务暂不可用，请稍后重试或手动输入。");
+  const result = await window.Tesseract.recognize(pendingMaterialImage, "chi_sim+eng", {
+    workerPath: "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/worker.min.js",
+    corePath: "https://cdn.jsdelivr.net/npm/tesseract.js-core@5.1.1",
+    langPath: "https://tessdata.projectnaptha.com/4.0.0"
+  });
+  return cleanMaterialOcrText(result.data?.text || "");
+}
+
 async function extractVideoMaterialFromBackend(videoUrl) {
   const response = await fetch("/api/material/video-extract", {
     method: "POST",
@@ -1048,6 +1078,7 @@ async function extractMaterialDraft() {
   const shareText = cleanVideoShareText(videoInput, videoUrl);
   let videoText = normalizeMaterialText([document.querySelector("#materialVideoText").value, shareText].filter(Boolean).join("\n\n"));
   let videoData = null;
+  let photoText = "";
   if (materialSourceMode === "photo" && !pendingMaterialImage) {
     showToast("请先拍照或从手机相册导入图片");
     return;
@@ -1059,13 +1090,16 @@ async function extractMaterialDraft() {
 
   const button = document.querySelector("#extractMaterial");
   button.disabled = true;
-  button.textContent = materialSourceMode === "video" && videoText.length < 12 ? "正在通过后端提取..." : "正在建立摘录...";
+  button.textContent = materialSourceMode === "photo" ? "正在识别图片文字..." : materialSourceMode === "video" && videoText.length < 12 ? "正在通过后端提取..." : "正在建立摘录...";
   try {
+    if (materialSourceMode === "photo") {
+      photoText = await recognizeMaterialImage();
+    }
     if (materialSourceMode === "video" && videoText.length < 12) {
       videoData = await extractVideoMaterialFromBackend(videoUrl);
       videoText = normalizeMaterialText(videoData.text);
     }
-    fillMaterialDraft(videoUrl, videoText, videoData);
+    fillMaterialDraft(videoUrl, materialSourceMode === "photo" ? photoText : videoText, videoData);
   } catch (error) {
     showToast(error.message.includes("Failed to fetch") ? "当前网站还没有连接后端平台，可先粘贴字幕或文案" : error.message);
   } finally {
@@ -1076,15 +1110,16 @@ async function extractMaterialDraft() {
 
 function fillMaterialDraft(videoUrl, videoText = "", videoData = null) {
   const isVideo = materialSourceMode === "video";
+  const cleanText = isVideo ? normalizeMaterialText(videoText) : cleanMaterialOcrText(videoText);
   document.querySelector("#materialSourceStep").hidden = true;
   document.querySelector("#materialResult").hidden = false;
-  document.querySelector("#materialTitle").value = isVideo ? (videoData?.title || inferMaterialTitle(videoText)) : "图片文字摘录（待核对）";
-  document.querySelector("#materialCategory").value = isVideo ? "社会" : "成长";
+  document.querySelector("#materialTitle").value = isVideo ? (videoData?.title || inferMaterialTitle(cleanText)) : inferMaterialTitle(cleanText, "图片文字摘录（待核对）");
+  document.querySelector("#materialCategory").value = isVideo ? "社会" : cleanText.includes("责任") || cleanText.includes("家国") ? "社会" : "成长";
   document.querySelector("#materialSource").value = isVideo ? videoUrl : "图片摘录（请补充书名、文章名或作者）";
-  document.querySelector("#materialKeywords").value = isVideo ? (videoData?.keywords?.join("、") || inferMaterialKeywords(videoText)) : "观点、事例、写作主题";
+  document.querySelector("#materialKeywords").value = isVideo ? (videoData?.keywords?.join("、") || inferMaterialKeywords(cleanText)) : inferMaterialKeywords(cleanText);
   document.querySelector("#materialContent").value = isVideo
-    ? buildVideoMaterialContent(videoText)
-    : "【请根据原图核对并替换以下内容】\n\n关键文字：摘录图片中最有信息量或表现力的句子。\n\n内容概括：用自己的话概括事件、人物或观点。\n\n写作角度：说明这段素材可以用于哪些作文主题。";
+    ? buildVideoMaterialContent(cleanText)
+    : buildPhotoMaterialContent(cleanText);
 }
 
 function saveMaterial(event) {
